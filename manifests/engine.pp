@@ -20,7 +20,11 @@
 #   Defaults to true.
 #
 # [*heat_stack_user_role*]
-#   (optional) Keystone role for heat template-defined users
+#   (optional) Keystone role for heat template-defined users.
+#   This setting does not actually create the role. If you change
+#   this to a different value you should also set
+#   heat::keystone::auth::heat_stack_user_role if you want the
+#   correct role created.
 #   Defaults to 'heat_stack_user'
 #
 # [*heat_metadata_server_url*]
@@ -73,13 +77,6 @@
 #   configure the keystone roles.
 #   Defaults to ['heat_stack_owner']
 #
-# === Deprecated Parameters
-#
-# [*configure_delegated_roles*]
-#   (optional) Whether to configure the delegated roles.
-#   Defaults to true
-#   Deprecated: Moved to heat::keystone::auth, will be removed in a future release.
-#
 class heat::engine (
   $auth_encryption_key,
   $package_ensure                      = 'present',
@@ -93,8 +90,7 @@ class heat::engine (
   $deferred_auth_method                = 'trusts',
   $default_software_config_transport   = 'POLL_SERVER_CFN',
   $default_deployment_signal_transport = 'CFN_SIGNAL',
-  $trusts_delegated_roles              = ['heat_stack_owner'],  #DEPRECATED
-  $configure_delegated_roles           = true,                  #DEPRECATED
+  $trusts_delegated_roles              = ['heat_stack_owner'],
 ) {
 
   # Validate Heat Engine AES key
@@ -123,13 +119,6 @@ class heat::engine (
       $service_ensure = 'running'
     } else {
       $service_ensure = 'stopped'
-    }
-  }
-
-  if $configure_delegated_roles {
-    warning ('configure_delegated_roles is deprecated in this class, use heat::keystone::auth')
-    keystone_role { $trusts_delegated_roles:
-      ensure => present,
     }
   }
 
