@@ -6,7 +6,7 @@
 #
 # [*heat_config*]
 #   (optional) Allow configuration of arbitrary Heat configurations.
-#   The value is an hash of heat_config resources. Example:
+#   The value is a hash of heat_config resources. Example:
 #   { 'DEFAULT/foo' => { value => 'fooValue'},
 #     'DEFAULT/bar' => { value => 'barValue'}
 #   }
@@ -23,6 +23,8 @@
 class heat::config (
   $heat_config = {},
 ) {
+
+  include ::heat::deps
 
   validate_hash($heat_config)
 

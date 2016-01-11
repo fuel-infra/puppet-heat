@@ -56,9 +56,6 @@ describe 'heat::engine' do
         :enable     => expected_params[:enabled],
         :hasstatus  => 'true',
         :hasrestart => 'true',
-        :require    => [ 'File[/etc/heat/heat.conf]',
-                         'Package[heat-common]',
-                         'Package[heat-engine]'],
         :tag        => 'heat-service',
       ) }
 
@@ -72,6 +69,9 @@ describe 'heat::engine' do
       it { is_expected.to contain_heat_config('DEFAULT/deferred_auth_method').with_value( expected_params[:deferred_auth_method] ) }
       it { is_expected.to contain_heat_config('DEFAULT/default_software_config_transport').with_value( expected_params[:default_software_config_transport] ) }
       it { is_expected.to contain_heat_config('DEFAULT/default_deployment_signal_transport').with_value( expected_params[:default_deployment_signal_transport] ) }
+      it { is_expected.to contain_heat_config('DEFAULT/instance_connection_is_secure').with_value('<SERVICE DEFAULT>') }
+      it { is_expected.to contain_heat_config('DEFAULT/instance_connection_https_validate_certificates').with_value('<SERVICE DEFAULT>') }
+      it { is_expected.to contain_heat_config('DEFAULT/max_resources_per_stack').with_value('<SERVICE DEFAULT>') }
     end
 
     context 'with disabled service managing' do
@@ -87,9 +87,6 @@ describe 'heat::engine' do
         :enable     => false,
         :hasstatus  => 'true',
         :hasrestart => 'true',
-        :require    => [ 'File[/etc/heat/heat.conf]',
-                         'Package[heat-common]',
-                         'Package[heat-engine]'],
         :tag        => 'heat-service',
       ) }
     end
@@ -104,7 +101,9 @@ describe 'heat::engine' do
 
   context 'on Debian platforms' do
     let :facts do
-      { :osfamily => 'Debian' }
+      @default_facts.merge({
+        :osfamily => 'Debian',
+      })
     end
 
     let :os_params do
@@ -118,7 +117,9 @@ describe 'heat::engine' do
 
   context 'on RedHat platforms' do
     let :facts do
-      { :osfamily => 'RedHat' }
+      @default_facts.merge({
+        :osfamily => 'RedHat',
+      })
     end
 
     let :os_params do
