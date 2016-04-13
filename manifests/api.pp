@@ -25,8 +25,8 @@
 #   Defaults to '8004'.
 #
 # [*workers*]
-#   (Optional) The port on which the server will listen.
-#   Defaults to '0'.
+#   (Optional) The number of workers to spawn.
+#   Defaults to undef.
 #
 # [*use_ssl*]
 #   (Optional) Whether to use ssl or not.
@@ -52,7 +52,7 @@ class heat::api (
   $enabled           = true,
   $bind_host         = '0.0.0.0',
   $bind_port         = '8004',
-  $workers           = '0',
+  $workers           = undef,
   $use_ssl           = false,
   $cert_file         = false,
   $key_file          = false,
@@ -106,7 +106,12 @@ class heat::api (
   heat_config {
     'heat_api/bind_host'  : value => $bind_host;
     'heat_api/bind_port'  : value => $bind_port;
-    'heat_api/workers'    : value => $workers;
+  }
+
+  if $workers {
+    heat_config { 'heat_api/workers' : value => $workers; }
+  } else {
+    heat_config { 'heat_api/workers' : ensure => absent; }
   }
 
   # SSL Options
